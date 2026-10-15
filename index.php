@@ -19,6 +19,18 @@ if (isset($_POST['submit'])) {
 
     }
 
+
+$laporan = [];
+
+if ($conn) {
+    $query = "SELECT l.*, k.nama_kategori
+              FROM laporan_kerusakan as l
+              JOIN kategori_fasilitas as k ON l.id_kategori = k.id_kategori
+              ORDER BY l.tanggal_laporan DESC";
+    $stmt = $conn->query($query);
+    $laporan = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -38,55 +50,61 @@ if (isset($_POST['submit'])) {
         body, input, textarea, select, button {
             font-family: 'Poppins', sans-serif;
         }
+
+        body {
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
     </style>
 
 </head>
 <body>
-    <!-- Bagian ini merupakan starter HTML. Belum ada koneksi database ataupun query. -->
-    <header class="bg-blue-500 text-white p-4 shadow-lg">
+    <header class="bg-blue-600 text-white p-4 shadow-lg">
         <div class="max-w-7xl mx-auto px-4 py-8 md:px-8">
-            <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-                <div>
+            <div class="flex flex-col gap-5">
+                <div class="flex flex-col">
                     <h1 class="mt-2 text-2xl md:text-4xl font-bold">Pelaporan Kerusakan Fasilitas Sekolah</h1>
+                    <p class="mt-5 max-w-2xl text-blue-100 text-sm md:text-base">Catat dan pantau laporan kerusakan fasilitas sekolah agar penanganan dapat dilakukan lebih cepat dan terorganisir.</p>
                 </div>
                 <nav aria-label="Navigasi utama" class="flex flex-wrap gap-3 text-sm font-medium">
                     <a href="#form-laporan" class="rounded border border-white/30 bg-white/10 px-4 py-2 hover:bg-white/20 transition">Buat Laporan</a>
                     <a href="#daftar-laporan" class="rounded border border-white/30 bg-white/10 px-4 py-2 hover:bg-white/20 transition">Daftar Laporan</a>
                 </nav>
             </div>
-            <p class="mt-5 max-w-2xl text-blue-100 text-sm md:text-base">Catat dan pantau laporan kerusakan fasilitas sekolah agar penanganan dapat dilakukan lebih cepat dan terorganisir.</p>
         </div>
     </header>
 
-    <main>
-        <section class="" id="form-laporan" aria-labelledby="judul-form">
-            <h2 id="judul-form">Form Pelaporan Kerusakan</h2>
-            <p>Lengkapi data berikut untuk melaporkan fasilitas yang rusak.</p>
+    <main class="max-w-7xl mx-auto px-4 py-8 md:px-8 bg-white shadow-md rounded-3xl mt-8">
+        <section class="" id="form-laporan" aria-labelledby="judul-form" class="mb-8">
+            <div class="mb-4">
+                <h2 id="judul-form" class="text-xl font-bold">Form Pelaporan Kerusakan</h2>
+                <p>Lengkapi data berikut untuk melaporkan fasilitas yang rusak.</p>
+            </div>
 
             <!-- TANTANGAN BONUS CREATE: Buat proses PHP agar POST menyimpan data. -->
-            <form action="" method="post" class="bg-gray-100 p-4 rounded shadow-md">
+            <form action="" method="post" class="bg-white p-4 rounded shadow-md border border-gray-300 mt-4">
                 <fieldset>
                     <legend class="font-bold mb-4">Data Pelaporan</legend>
 
                     <div class="mb-4">
-                        <label for="nama_pelapor">Nama pelapor</label>
-                        <input class="border rounded" type="text" id="nama_pelapor" name="nama_pelapor" maxlength="100" required>
+                        <label for="nama_pelapor" class="font-semibold block">Nama pelapor</label>
+                        <input class="border rounded mt-3" type="text" id="nama_pelapor" name="nama_pelapor" maxlength="100" required>
                     </div>
 
                     <div class="mb-4">
-                        <label for="nama_fasilitas">Nama fasilitas</label>
-                        <input type="text" id="nama_fasilitas" name="nama_fasilitas" maxlength="100" required>
+                        <label for="nama_fasilitas" class="font-semibold block">Nama fasilitas</label>
+                        <input class="border rounded mt-3" type="text" id="nama_fasilitas" name="nama_fasilitas" maxlength="100" required>
                     </div>
 
                     <div class="mb-4">
-                        <label for="lokasi">Lokasi kerusakan</label>
-                        <input type="text" id="lokasi" name="lokasi" maxlength="100" required>
+                        <label for="lokasi" class="font-semibold block">Lokasi kerusakan</label>
+                        <input class="border rounded mt-3" type="text" id="lokasi" name="lokasi" maxlength="100" required>
                     </div>
 
                     <div class="mb-4">
-                        <label for="id_kategori">Kategori fasilitas</label>
-                        <select id="id_kategori" name="id_kategori" required>
-                            <option value="">-- Pilih kategori --</option>
+                        <label for="id_kategori" class="font-semibold block">Kategori fasilitas</label>
+                        <select class="border rounded mt-3 p-1" id="id_kategori" name="id_kategori" required>
+                            <option value=""> Pilih kategori </option>
                             <!-- Nilai berikut sesuai dengan data awal kategori_fasilitas. -->
                             <option value="1">Elektronik</option>
                             <option value="2">Furnitur</option>
@@ -95,30 +113,34 @@ if (isset($_POST['submit'])) {
                         </select>
                     </div>
 
-                    <p>
-                        <label for="deskripsi">Deskripsi kerusakan</label>
-                        <textarea id="deskripsi" name="deskripsi" rows="4" required></textarea>
-                    </p>
+                    <div class="mb-4">
+                        <label for="deskripsi" class="font-semibold block">Deskripsi kerusakan</label>
+                        <textarea class="border rounded mt-3" id="deskripsi" name="deskripsi" rows="4" required></textarea>
+                    </div>
 
-                    <p>
-                        <label for="prioritas">Prioritas</label>
-                        <select id="prioritas" name="prioritas" required>
-                            <option value="">-- Pilih prioritas --</option>
+                    <div class="mb-4">
+                        <label for="prioritas" class="font-semibold block">Prioritas</label>
+                        <select class="border rounded mt-3 p-1" id="prioritas" name="prioritas" required>
+                            <option value=""> Pilih prioritas </option>
                             <option value="Rendah">Rendah</option>
                             <option value="Sedang">Sedang</option>
                             <option value="Tinggi">Tinggi</option>
                         </select>
-                    </p>
+                    </div>
 
-                    <p><button type="submit">Kirim Laporan</button></p>
+                    <div class="mb-4">
+                        <p><button type="submit" class="font-md bg-blue-500 p-3 rounded-xl text-white mt-2 rounded hover:bg-blue-600">Kirim Laporan</button></p>
+                    </div>
                 </fieldset>
             </form>
-            <p><small>Catatan: tombol Kirim Laporan belum menyimpan apa pun. Fitur Create merupakan tantangan bonus.</small></p>
+            <!-- <p><small>Catatan: tombol Kirim Laporan belum menyimpan apa pun. Fitur Create merupakan tantangan bonus.</small></p> -->
         </section>
 
-        <section id="daftar-laporan" aria-labelledby="judul-daftar">
-            <h2 id="judul-daftar">Daftar Laporan Kerusakan</h2>
-            <p>Seluruh laporan yang tercatat pada database ditampilkan di bagian ini.</p>
+        <section id="daftar-laporan" aria-labelledby="judul-daftar" class="mt-8">
+            <div class="mb-8">
+                <h2 id="judul-daftar" class="font-bold text-xl">Daftar Laporan Kerusakan</h2>
+                <p>Seluruh laporan yang tercatat pada database ditampilkan di bagian ini.</p>
+            </div>
 
             <!-- TANTANGAN WAJIB:
                  1. Buat sendiri koneksi PHP ke MySQL.
@@ -126,20 +148,35 @@ if (isset($_POST['submit'])) {
                  3. Ganti baris placeholder pada tbody dengan perulangan hasil query.
                  4. Jangan mengetik data database secara manual di HTML.
             -->
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">No.</th>
-                        <th scope="col">Fasilitas</th>
-                        <th scope="col">Lokasi</th>
-                        <th scope="col">Pelapor</th>
-                        <th scope="col">Prioritas</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Tanggal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
+            <div class="overflow-x-auto rounded-xl border border-gray">
+                <table class="min-w-full text-left">
+                    <thead class="bg-blue-500">
+                        <tr>
+                            <th scope="col" class="px-4 py-4 text-white">No.</th>
+                            <th scope="col" class="px-4 py-4 text-white">Fasilitas</th>
+                            <th scope="col" class="px-4 py-4 text-white">Lokasi</th>
+                            <th scope="col" class="px-4 py-4 text-white">Pelapor</th>
+                            <th scope="col" class="px-4 py-4 text-white">Prioritas</th>
+                            <th scope="col" class="px-4 py-4 text-white">Status</th>
+                            <th scope="col" class="px-4 py-4 text-white">Tanggal</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php foreach($laporan as $index => $row): ?>
+                        <tr class="">
+                            <td class="px-4 py-4"><?php echo $index + 1; ?></td>
+                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_fasilitas']); ?></td>
+                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['lokasi']); ?></td>
+                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_pelapor']); ?></td>
+                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['prioritas']); ?></td>
+                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['status']); ?></td>
+                            <td><?php echo htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))); ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                    <!-- <tbody class="bg-white">
                         <?php
                         if ($conn) {
                             $query = "SELECT * FROM laporan_kerusakan";
@@ -154,16 +191,17 @@ if (isset($_POST['submit'])) {
                                 echo "<td>" . htmlspecialchars($row['nama_pelapor']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['prioritas']) . "</td>";
                                 echo "<td>" . htmlspecialchars($row['status']) . "</td>";
-                                // echo "<td>" . htmlspecialchars($row['tanggal']) . "</td>";
+                                echo "<td>" . htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))) . "</td>";
                                 echo "</tr>";
                             }
                         } else {
                             echo "<tr><td colspan='7'>Koneksi database gagal.</td></tr>";
                         }
                         ?>
-                    </tr>
-                </tbody>
-            </table>
+                    </tbody> -->
+                </table>
+            </div>
+
         </section>
     </main>
 
