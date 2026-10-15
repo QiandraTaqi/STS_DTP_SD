@@ -4,20 +4,20 @@ require('config.php');
 
 
 
-if (isset($_POST['submit'])) {
-    $nama_pelapor = $_POST['nama_pelapor'];
-    $nama_fasilitas = $_POST['nama_fasilitas'];
-    $lokasi = $_POST['lokasi'];
-    $id_kategori = $_POST['id_kategori'];
-    $deskripsi = $_POST['deskripsi'];
-    $prioritas = $_POST['prioritas'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    $nama_pelapor = trim($_POST['nama_pelapor'] ?? '');
+    $nama_fasilitas = trim($_POST['nama_fasilitas'] ?? '');
+    $lokasi = trim($_POST['lokasi'] ?? '');
+    $id_kategori = $_POST['id_kategori'] ?? '';
+    $deskripsi = trim($_POST['deskripsi'] ?? '');
+    $prioritas = $_POST['prioritas'] ?? '';
 
-    $query = "INSERT INTO laporan_kerusakan (nama_pelapor, nama_fasilitas, lokasi, id_kategori, deskripsi, prioritas) VALUES (?, ?, ?, ?, ?, ?)";
-
-    $stmt = $conn->prepare($query);
-    $stmt->execute([$nama_pelapor, $nama_fasilitas, $lokasi, $id_kategori, $deskripsi, $prioritas]);
-
+    if ($nama_pelapor !== '' && $nama_fasilitas !== '' && $lokasi !== '' && $id_kategori !== '' && $deskripsi !== '' && $prioritas !== '') {
+        $query = "INSERT INTO laporan_kerusakan (nama_pelapor, nama_fasilitas, lokasi, id_kategori, deskripsi, prioritas) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->execute([$nama_pelapor, $nama_fasilitas, $lokasi, $id_kategori, $deskripsi, $prioritas]);
     }
+}
 
 
 $laporan = [];
@@ -129,7 +129,7 @@ if ($conn) {
                     </div>
 
                     <div class="mb-4">
-                        <p><button type="submit" class="font-md bg-blue-500 p-3 rounded-xl text-white mt-2 rounded hover:bg-blue-600">Kirim Laporan</button></p>
+                        <p><button type="submit" name="submit" class="font-md bg-blue-500 p-3 rounded-xl text-white mt-2 rounded hover:bg-blue-600">Kirim Laporan</button></p>
                     </div>
                 </fieldset>
             </form>
@@ -176,29 +176,6 @@ if ($conn) {
                         <?php endforeach; ?>
                     </tbody>
 
-                    <!-- <tbody class="bg-white">
-                        <?php
-                        if ($conn) {
-                            $query = "SELECT * FROM laporan_kerusakan";
-                            $stmt = $conn->query($query);
-                            $laporan = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                            foreach ($laporan as $index => $row) {
-                                echo "<tr>";
-                                echo "<td>" . ($index + 1) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['nama_fasilitas']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['lokasi']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['nama_pelapor']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['prioritas']) . "</td>";
-                                echo "<td>" . htmlspecialchars($row['status']) . "</td>";
-                                echo "<td>" . htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))) . "</td>";
-                                echo "</tr>";
-                            }
-                        } else {
-                            echo "<tr><td colspan='7'>Koneksi database gagal.</td></tr>";
-                        }
-                        ?>
-                    </tbody> -->
                 </table>
             </div>
 
