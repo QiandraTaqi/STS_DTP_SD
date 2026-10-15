@@ -4,20 +4,20 @@ require('config.php');
 
 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
-    $nama_pelapor = trim($_POST['nama_pelapor'] ?? '');
-    $nama_fasilitas = trim($_POST['nama_fasilitas'] ?? '');
-    $lokasi = trim($_POST['lokasi'] ?? '');
-    $id_kategori = $_POST['id_kategori'] ?? '';
-    $deskripsi = trim($_POST['deskripsi'] ?? '');
-    $prioritas = $_POST['prioritas'] ?? '';
+if (isset($_POST['submit'])) {
+    $nama_pelapor = $_POST['nama_pelapor'];
+    $nama_fasilitas = $_POST['nama_fasilitas'];
+    $lokasi = $_POST['lokasi'];
+    $id_kategori = $_POST['id_kategori'];
+    $deskripsi = $_POST['deskripsi'];
+    $prioritas = $_POST['prioritas'];
 
-    if ($nama_pelapor !== '' && $nama_fasilitas !== '' && $lokasi !== '' && $id_kategori !== '' && $deskripsi !== '' && $prioritas !== '') {
-        $query = "INSERT INTO laporan_kerusakan (nama_pelapor, nama_fasilitas, lokasi, id_kategori, deskripsi, prioritas) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($query);
-        $stmt->execute([$nama_pelapor, $nama_fasilitas, $lokasi, $id_kategori, $deskripsi, $prioritas]);
+    $query = "INSERT INTO laporan_kerusakan (nama_pelapor, nama_fasilitas, lokasi, id_kategori, deskripsi, prioritas) VALUES (?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($query);
+    $stmt->execute([$nama_pelapor, $nama_fasilitas, $lokasi, $id_kategori, $deskripsi, $prioritas]);
+
     }
-}
 
 
 $laporan = [];
@@ -163,19 +163,48 @@ if ($conn) {
                     </thead>
 
                     <tbody>
-                        <?php foreach($laporan as $index => $row): ?>
-                        <tr class="">
-                            <td class="px-4 py-4"><?php echo $index + 1; ?></td>
-                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_fasilitas']); ?></td>
-                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['lokasi']); ?></td>
-                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_pelapor']); ?></td>
-                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['prioritas']); ?></td>
-                            <td class="px-4 py-4"><?php echo htmlspecialchars($row['status']); ?></td>
-                            <td><?php echo htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))); ?></td>
-                        </tr>
+                        <?php if (!empty($laporan)): ?> 
+                            <?php foreach($laporan as $index => $row): ?>
+                                <tr class="">
+                                    <td class="px-4 py-4"><?php echo $index + 1; ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_fasilitas']); ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars($row['lokasi']); ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars($row['nama_pelapor']); ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars($row['prioritas']); ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars($row['status']); ?></td>
+                                    <td class="px-4 py-4"><?php echo htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))); ?></td>
+                                </tr>
                         <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-500">Belum ada laporan yang tercatat.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
 
+                    <!-- <tbody class="bg-white">
+                        <?php
+                        if ($conn) {
+                            $query = "SELECT * FROM laporan_kerusakan";
+                            $stmt = $conn->query($query);
+                            $laporan = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                            foreach ($laporan as $index => $row) {
+                                echo "<tr>";
+                                echo "<td>" . ($index + 1) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['nama_fasilitas']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['lokasi']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['nama_pelapor']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['prioritas']) . "</td>";
+                                echo "<td>" . htmlspecialchars($row['status']) . "</td>";
+                                echo "<td>" . htmlspecialchars(date('d-m-Y', strtotime($row['tanggal_laporan']))) . "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='7'>Koneksi database gagal.</td></tr>";
+                        }
+                        ?>
+                    </tbody> -->
                 </table>
             </div>
 
